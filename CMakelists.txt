@@ -1,36 +1,30 @@
 cmake_minimum_required(VERSION 3.27)
-project(XVFS LANGUAGES CXX C)
 
-# Set architecture (x64)
-set(CMAKE_GENERATOR_PLATFORM x64)
+project(XVFS LANGUAGES C CXX)
 
-# Set build configurations
-if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
-endif()
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Output directories
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/${CMAKE_BUILD_TYPE})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/${CMAKE_BUILD_TYPE})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build/${CMAKE_BUILD_TYPE})
-
-# Source files
-file(GLOB_RECURSE XVFS_SOURCES
-    "src/*.c"
-    "src/*.cpp"
-    "src/*.h"
-    "src/*.hpp"
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
+"${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-# Define static library
-add_library(XVFS STATIC ${XVFS_SOURCES})
-
-# Include directories
-target_include_directories(XVFS PUBLIC include)
-
-# C++ standard
-set_target_properties(XVFS PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
+file(GLOB_RECURSE HEADER_FILES CONFIGURE_DEPENDS
+"${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
+
+message(STATUS "Project source directory: ${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_library(XVFS STATIC 
+${SOURCE_FILES}
+${HEADER_FILES}
+)
+
+target_include_directories(XVFS
+PUBLIC
+${CMAKE_CURRENT_SOURCE_DIR}/include/
+)
+
+add_subdirectory(test)
